@@ -40,13 +40,16 @@ class RichText extends Component {
       });
     }
 
-    handleStylesChange = (styles) => {
+    removeStyle = (currentStyles, style) => currentStyles & (~style)
+    addStyle = (currentStyles, style) => currentStyles | style
+
+    handleStylesChange = (processStyle) => (style) => {
       const { start, end } = this.state.textSelection;
       const { textStyles } = this.state;
       if (start === end) return; // We ignore if there is no text selection
 
       for (let i = start ; i < end ; i++) {
-        textStyles[i] = styles;
+        textStyles[i] = processStyle(textStyles[i], style);
       }
 
       this.setState({ 
@@ -61,19 +64,20 @@ class RichText extends Component {
     }
 
     render() {
-        return (
-            <main>
-              <ControlPanel
-                stylesApplied={this.state.stylesApplied}
-                onApplyStyles={this.handleStylesChange}
-              />
-              <FileZone
-                textArray={this.state.textArray}
-                textStyles={this.state.textStyles}
-                onTextSelectionChange={this.handleTextSelectionChange}
-              />
-            </main>
-        );
+      return (
+        <main>
+          <ControlPanel
+            stylesApplied={this.state.stylesApplied}
+            onAddStyle={this.handleStylesChange(this.addStyle)}
+            onRemoveStyle={this.handleStylesChange(this.removeStyle)}
+          />
+          <FileZone
+            textArray={this.state.textArray}
+            textStyles={this.state.textStyles}
+            onTextSelectionChange={this.handleTextSelectionChange}
+          />
+        </main>
+      );
     }
 }
 

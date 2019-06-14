@@ -4,10 +4,10 @@ import { TS } from '../enum';
 
 class ControlPanel extends Component {
   toggleBitFlag = (flag) => () => {
-    const { stylesApplied, onApplyStyles } = this.props;
+    const { stylesApplied, onAddStyle, onRemoveStyle } = this.props;
 
-    if (stylesApplied & flag) onApplyStyles(stylesApplied & (~flag)); // Unset
-    else onApplyStyles(stylesApplied | flag) // Set
+    if (stylesApplied & flag) onRemoveStyle(flag); // Unset
+    else onAddStyle(flag) // Set
   }
 
   render = () => {
