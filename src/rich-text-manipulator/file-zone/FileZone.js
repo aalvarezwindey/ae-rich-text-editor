@@ -11,7 +11,7 @@ class FileZone extends Component {
     var doc = element.ownerDocument || element.document;
     var win = doc.defaultView || doc.parentWindow;
     var sel;
-    if (typeof win.getSelection != "undefined") {
+    if (typeof win.getSelection !== "undefined") {
         sel = win.getSelection();
         if (sel.rangeCount > 0) {
             var range = win.getSelection().getRangeAt(0);
@@ -22,7 +22,7 @@ class FileZone extends Component {
             preCaretRange.setEnd(range.endContainer, range.endOffset);
             end = preCaretRange.toString().length;
         }
-    } else if ( (sel = doc.selection) && sel.type != "Control") {
+    } else if ( (sel = doc.selection) && sel.type !== "Control") {
         var textRange = sel.createRange();
         var preCaretTextRange = doc.body.createTextRange();
         preCaretTextRange.moveToElementText(element);
@@ -39,7 +39,6 @@ class FileZone extends Component {
     const { onTextSelectionChange } = this.props;
     const node = document.getElementById('file');
     const { start, end } = this.getSelectionCharacterOffsetWithin(node);
-    console.log('start, end', start, end);
     
     onTextSelectionChange(start, end);
   }
@@ -97,7 +96,6 @@ class FileZone extends Component {
 
   render = () => {
     return (
-      <div id="file-zone">
         <div 
           id="file" 
           onMouseUp={this.getTextSelection}
@@ -106,7 +104,6 @@ class FileZone extends Component {
             __html: this.generateHtml()
           }}
         />
-      </div>
     );
   }
 }

@@ -3,6 +3,7 @@ import ControlPanel from "./control-panel/ControlPanel";
 import FileZone from "./file-zone/FileZone";
 import getMockText from './../text.service';
 import { TS } from './enum';
+import SynonymMaker from './synonym/SynonymMaker';
 
 class RichText extends Component {
     constructor(props) {
@@ -14,6 +15,7 @@ class RichText extends Component {
           end: 0,
         },
         textArray: [],
+        textStringSelected: '',
         textStyles: [],
         stylesApplied: TS.NONE,
       }
@@ -28,6 +30,12 @@ class RichText extends Component {
       });
     }
 
+    getTextStringSelected = (start, end) => {
+      if (start === end) return undefined;
+      const str = this.state.textArray.slice(start, end).join('');
+      return str;
+    }
+
     handleTextSelectionChange = (start, end) => {
       // console.log('start, end', start, end);
       const { textStyles } = this.state;
@@ -37,6 +45,7 @@ class RichText extends Component {
           end
         },
         stylesApplied: textStyles[start], // We use the start index as Gmail rich text editor
+        textStringSelected: this.getTextStringSelected(start, end)
       });
     }
 
@@ -63,6 +72,42 @@ class RichText extends Component {
       });
     }
 
+    handleSynonymReplace = (synonym) => {
+      const { start, end } = this.state.textSelection;
+      const { textArray, textStyles } = this.state;
+      const synonymArr = Array.from(synonym);
+      let newTextArray = [];
+      let newTextStyles = [];
+
+      // Copy first part of array
+      for (let i = 0 ; i < start ; i++) {
+        newTextArray[i] = textArray[i];
+        newTextStyles[i] = textStyles[i];
+      }
+
+      // Copy the synonym
+      for (let i = start ; i < start + synonymArr.length ; i++) {
+        newTextArray[i] = synonymArr[i - start];
+
+        // we use the first styles as default
+        newTextStyles[i] = textStyles[start];
+      }
+
+      // Copy the rest of array
+      const originalLength = end - start;
+      const diffBetweenSynonymAndOriginal = synonymArr.length - originalLength;
+      for (let i = end ; i < textArray.length ; i++) {
+        newTextArray[i + diffBetweenSynonymAndOriginal] = textArray[i];
+        newTextStyles[i + diffBetweenSynonymAndOriginal] = textStyles[i];
+      }
+
+      this.setState({
+        textArray: newTextArray,
+        textStyles: newTextStyles,
+        textStringSelected: undefined
+      })
+    }
+
     render() {
       return (
         <main>
@@ -75,6 +120,10 @@ class RichText extends Component {
             textArray={this.state.textArray}
             textStyles={this.state.textStyles}
             onTextSelectionChange={this.handleTextSelectionChange}
+          />
+          <SynonymMaker 
+            text={this.state.textStringSelected}
+            onReplace={this.handleSynonymReplace}
           />
         </main>
       );
